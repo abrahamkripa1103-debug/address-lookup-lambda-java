@@ -8,7 +8,7 @@ Resources:
     Properties:
       Handler: com.example.lambda.handler.StreamLambdaHandler
       Runtime: java17
-      CodeUri: target/address-lookup-lambda-java-1.0.0.jar
+      CodeUri: target/address-lookup-lambda-java-1.0.0-shaded.jar
       MemorySize: 1024
       Timeout: 20
       Environment:
