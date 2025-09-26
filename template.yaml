@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Spring Boot REST on AWS Lambda (aws-serverless-java-container)
+
+Resources:
+  AddressLookupFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: com.example.lambda.handler.StreamLambdaHandler
+      Runtime: java17
+      CodeUri: target/address-lookup-lambda-java-1.0.0.jar
+      MemorySize: 1024
+      Timeout: 20
+      Environment:
+        Variables:
+          # ADDR_QUERY: "..."      # Optional overrides
+          # SUBURB_QUERY: "..."    # "
+          # SED_QUERY: "..."       # "
+          # HTTP_TIMEOUT_MS: "8000"
+          # RETRY_MAX_ATTEMPTS: "2"
+          # RETRY_BASE_DELAY_MS: "200"
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /
+            Method: GET

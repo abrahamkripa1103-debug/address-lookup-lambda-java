@@ -59,19 +59,14 @@
 
   <build>
     <plugins>
-
       <!-- Spring Boot plugin: enables `mvn spring-boot:run` and creates an executable Boot JAR -->
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <version>3.4.5</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>repackage</goal>
-            </goals>
-          </execution>
-        </executions>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
       </plugin>
 
 
@@ -95,6 +90,8 @@
             <goals><goal>shade</goal></goals>
             <configuration>
               <createDependencyReducedPom>false</createDependencyReducedPom>
+              <shadedArtifactAttached>true</shadedArtifactAttached>
+              <shadedClassifierName>shaded</shadedClassifierName>
               <filters>
                 <filter>
                   <artifact>*:*</artifact>
