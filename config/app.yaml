@@ -1,0 +1,6 @@
+addressLayerQuery: "https://portal.spatial.nsw.gov.au/server/rest/services/NSW_Geocoded_Addressing_Theme/FeatureServer/1/query"
+suburbLayerQuery:  "https://portal.spatial.nsw.gov.au/server/rest/services/NSW_Administrative_Boundaries_Theme/FeatureServer/2/query"
+sedLayerQuery:     "https://portal.spatial.nsw.gov.au/server/rest/services/NSW_Administrative_Boundaries_Theme/FeatureServer/4/query"
+httpTimeout: "PT8S"
+retryMaxAttempts: 2
+retryBaseDelay: "PT0.2S"
