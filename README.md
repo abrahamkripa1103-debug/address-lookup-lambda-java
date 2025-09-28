@@ -54,3 +54,9 @@ https://ljodtu5xlxur4izzvxizmys32a0hlxtr.lambda-url.ap-southeast-2.on.aws/
 sample test
 ```bash
 curl.exe -v "https://ljodtu5xlxur4izzvxizmys32a0hlxtr.lambda-url.ap-southeast-2.on.aws/?address=206/7-11%20Derowie%20Avenue%20Homebush"
+```
+
+Important Notes:
+* The Function URL is public and does NOT require AWS credentials.
+* Replace the address query string with any NSW address.
+* Ensure spaces in the address are URL encoded as %20 (e.g., 346 PANORAMA AVENUE BATHURST → 346%20PANORAMA%20AVENUE%20BATHURST).
