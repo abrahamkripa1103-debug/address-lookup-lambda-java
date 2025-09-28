@@ -2,18 +2,21 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <groupId>com.example</groupId>
   <artifactId>address-lookup-lambda-java</artifactId>
   <version>1.0.0</version>
   <name>address-lookup-lambda-java</name>
-  <description>Spring Boot REST on AWS Lambda with aws-serverless-java-container</description>
+  <description>Spring Boot REST API integrated with AWS Lambda</description>
 
+  <!-- ===== Properties ===== -->
   <properties>
     <java.version>17</java.version>
     <spring.boot.version>3.3.3</spring.boot.version>
     <jackson.version>2.17.1</jackson.version>
   </properties>
 
+  <!-- ===== Spring Boot Dependency Management ===== -->
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -26,25 +29,29 @@
     </dependencies>
   </dependencyManagement>
 
+  <!-- ===== Dependencies ===== -->
   <dependencies>
+    <!-- Spring Boot Web for local testing -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
 
+    <!-- AWS Lambda adapter for Spring Boot -->
     <dependency>
       <groupId>com.amazonaws.serverless</groupId>
       <artifactId>aws-serverless-java-container-springboot3</artifactId>
       <version>2.1.5</version>
     </dependency>
 
-    <!-- Jackson (already pulled by Spring, but pin YAML) -->
+    <!-- Jackson YAML support -->
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
       <artifactId>jackson-dataformat-yaml</artifactId>
       <version>${jackson.version}</version>
     </dependency>
 
+    <!-- Testing dependencies -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
@@ -57,55 +64,92 @@
     </dependency>
   </dependencies>
 
+  <!-- ===== Build Plugins ===== -->
   <build>
     <plugins>
-      <!-- Spring Boot plugin: enables `mvn spring-boot:run` and creates an executable Boot JAR -->
-      <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>3.4.5</version>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
-      </plugin>
-
-
+      <!-- Compiler plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.11.0</version>
         <configuration>
           <release>${java.version}</release>
+          <parameters>true</parameters>
         </configuration>
-      </plugin>
-
-      <!-- Shade into a single Lambda-friendly JAR -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>3.5.0</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals><goal>shade</goal></goals>
-            <configuration>
-              <createDependencyReducedPom>false</createDependencyReducedPom>
-              <shadedArtifactAttached>true</shadedArtifactAttached>
-              <shadedClassifierName>shaded</shadedClassifierName>
-              <filters>
-                <filter>
-                  <artifact>*:*</artifact>
-                  <excludes>
-                    <exclude>META-INF/*.SF</exclude>
-                    <exclude>META-INF/*.DSA</exclude>
-                    <exclude>META-INF/*.RSA</exclude>
-                  </excludes>
-                </filter>
-              </filters>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
+
+  <!-- ===== Profiles for Local vs Lambda ===== -->
+  <profiles>
+    <!-- Local: build fat jar with Tomcat for local testing -->
+    <profile>
+      <id>local</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <version>3.4.5</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>repackage</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- Lambda: build flat shaded jar for AWS Lambda -->
+    <profile>
+      <id>lambda</id>
+      <build>
+        <plugins>
+          <!-- Disable repackage so we don't get BOOT-INF -->
+          <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <version>3.4.5</version>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </plugin>
+
+          <!-- Shade into a single Lambda-friendly jar -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.5.0</version>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals><goal>shade</goal></goals>
+                <configuration>
+                  <createDependencyReducedPom>false</createDependencyReducedPom>
+                  <shadedArtifactAttached>true</shadedArtifactAttached>
+                  <shadedClassifierName>shaded</shadedClassifierName>
+                  <filters>
+                    <filter>
+                      <artifact>*:*</artifact>
+                      <excludes>
+                        <exclude>META-INF/*.SF</exclude>
+                        <exclude>META-INF/*.DSA</exclude>
+                        <exclude>META-INF/*.RSA</exclude>
+                      </excludes>
+                    </filter>
+                  </filters>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
