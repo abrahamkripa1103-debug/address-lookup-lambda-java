@@ -1,15 +1,34 @@
-# NSW Address Lookup — Spring Boot on AWS Lambda (Option B)
+# NSW Address Lookup 
 
-This project uses **Spring Boot 3** + **aws-serverless-java-container** to run a REST controller on AWS Lambda.
+looks up an NSW street address and returns:
+
+* Geographic coordinates (lat/lon)
+* Suburb name
+* State Electoral District (SED)
+
+
+## Architecture
+
+1.Geocode the input address using NSW Geocoded Addressing Theme → get longitude, latitude.
+
+2.Reverse overlay those coordinates on NSW Administrative Boundaries to fetch:
+
+* Suburb (Localities layer)
+
+* State Electoral District (SED layer)
+
+3.Respond with a compact JSON object.
+
+No AWS credentials are required at runtime; all NSW services are public.
 
 ## Build
 ```bash
 mvn clean package
 ```
 
-This produces: `target/nsw-address-lookup-springboot-1.0.0-shaded.jar`
+This produces: `target/nsw-address-lookup-springboot-1.0.0.jar`
 
-## Local (Spring Boot JVM)
+## Local
 ```bash
 mvn spring-boot:run
 # Then call:
@@ -24,21 +43,14 @@ curl "http://127.0.0.1:3000/?address=346%20PANORAMA%20AVENUE%20BATHURST"
 ```
 
 ## Deploy
-Create a Lambda function with:
+Created a Lambda function with:
 - **Runtime**: Java 17
 - **Handler**: `com.example.lambda.handler.StreamLambdaHandler`
-- Upload the shaded JAR.
+- Uploaded the shaded JAR nsw-address-lookup-springboot-1.0.0-shaded.jar'
 
-## Configuration
-- Env vars (highest priority): `ADDR_QUERY`, `SUBURB_QUERY`, `SED_QUERY`, `HTTP_TIMEOUT_MS`, `RETRY_MAX_ATTEMPTS`, `RETRY_BASE_DELAY_MS`
-- Optional file: `config/app.yaml` (or `/opt/config/app.yaml` via Lambda Layer)
+##  Function URL:
+https://ljodtu5xlxur4izzvxizmys32a0hlxtr.lambda-url.ap-southeast-2.on.aws/
 
-## Endpoint
-`GET /?address=<FULL ADDRESS>` →
-```json
-{
-  "location": { "latitude": -33.429..., "longitude": 149.567... },
-  "suburb": "BATHURST",
-  "stateElectoralDistrict": "BATHURST"
-}
-```
+sample test
+```bash
+curl.exe -v "https://ljodtu5xlxur4izzvxizmys32a0hlxtr.lambda-url.ap-southeast-2.on.aws/?address=206/7-11%20Derowie%20Avenue%20Homebush"
